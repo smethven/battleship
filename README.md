@@ -20,10 +20,10 @@ This project is in fulfillment of the [CPSC 312 2021W1 project requirements](htt
 
 Our team is:
 
-+ Team Member Name 1 (student # 1): optional awesome nickname 1
-+ Team Member Name 2 (student # 2): optional awesome nickname 2
-+ If you have a third member: Team Member Name 3 (student # 3): optional awesome nickname 3
-+ If you have a fourth member: Team Member Name 4 (student # 4): optional awesome nickname 4
++ Nicholas Kao 47741301
++ Ruchit Palrecha ________
++ Skye Methven ________
++ Grant Sutton ________
 
 We call ourselves: optional awesome team name.
 
