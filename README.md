@@ -47,6 +47,13 @@ Or:
 
 (It's easy to focus on the product and not the problem. Remember to include both!)
 
+## DRAFT(feel free to scrap if you have something better):
+
+The Problem: We all know how fun it is to sink your friend’s battleship on game night, but what if we were living in a dystopian future where a virus has caused a global pandemic, and game night is never the same again. You must quarantine to keep safe but the human psyche relies on connections with others in order to keep sane. You haven’t sunk your friend’s battleship in weeks and you feel your sense of sanity slipping away. You just wish you could play your favourite game with your friend to connect without compromising on safety.
+
+The Solution: Online battleship. We will harness the power of the internet to create an online battleship game. Our product will allow two people to connect from anywhere in the world, whether they are quarantining or simply separated by land and sea. No longer will game night or your sanity need to be compromised. Hosted on a website, our product with have a visually exciting UI complete with animated graphics of battleships sinking. It will also have a chat feature to fully support a game night experience. Written in Haskell, this product expands on our 312 learning by applying what we learned in Lecture 5 about representing games, and expanding it by incorporating networking to allow a multiplayer game. 
+
+
 ## Minimal Viable Project
 
 Replace this with a description of the minimal viable project you will actually build for CPSC 312 (if this becomes your final project).
