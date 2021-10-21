@@ -8,11 +8,11 @@ The template to edit begins below. You can delete this header section once you'v
 
 We will post some additional material to include when you reach the final project stage.
 
-# Insert My Excellent Project Title Here
+# BattleShips
 
-This will be replaced with a very brief (one paragraph, 2-3 sentences) overview of the project.
 
-Leave the following sentence in so you can easily link back to the requirements and *especially* rubric while editing your project:
+We will be re-creating the classic popular board game of BattleShips. Playable through the command line
+over the internet.
 
 This project is in fulfillment of the [CPSC 312 2021W1 project requirements](https://steven-wolfman.github.io/cpsc-312-website/project.html).
 
@@ -25,9 +25,10 @@ Our team is:
 + Skye Methven ________
 + Grant Sutton ________
 
-We call ourselves: optional awesome team name.
+We call ourselves: BattleShips
 
 ## Product Pitch
+
 
 Replace this with a pitch for your project and the problem it solves. This is your vision for what the project
 would like like as a complete product, ready for awesome action. (Yes, awesomeness seems to be a theme.)
