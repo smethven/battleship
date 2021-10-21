@@ -22,7 +22,7 @@ Our team is:
 
 + Nicholas Kao 47741301
 + Ruchit Palrecha ________
-+ Skye Methven ________
++ Skye Methven 11305109
 + Grant Sutton ________
 
 We call ourselves: BattleShips
