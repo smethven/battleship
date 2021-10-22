@@ -47,7 +47,7 @@ Or:
 
 (It's easy to focus on the product and not the problem. Remember to include both!)
 
-DRAFT(feel free to scrap if you have something better):
+DRAFT:
 
 The Problem: We all know how fun it is to sink your friend’s battleship on game night, but what if we were living in a dystopian future where a virus has caused a global pandemic, and game night is never the same again. You must quarantine to keep safe but the human psyche relies on connections with others in order to keep sane. You haven’t sunk your friend’s battleship in weeks and you feel your sense of sanity slipping away. You just wish you could play your favourite game with your friend to connect without compromising on safety.
 
