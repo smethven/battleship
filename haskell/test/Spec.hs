@@ -3,7 +3,10 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 main :: IO ()
-main = defaultMain $ testGroup "Tests" $
+main = putStrLn "Our proof of concept is a server socket to connect to, and so is not tested through this file/Tasty. See the instructions in the README for how to test our proof of concept."
+    
+    {-
+defaultMain $ testGroup "Tests" $
   [ testCase "Addition works" $ do
       2 + 3 @?= 5  -- actual @?= expected
   , testCase "Multiplication works" $ do
@@ -15,3 +18,4 @@ main = defaultMain $ testGroup "Tests" $
   -- , testCase "Explicit failure" $ do
   --     assertFailure "BOOM!"
   ]
+-}

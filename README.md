@@ -1,17 +1,6 @@
-# CPSC 312 Project
-
-Project Template for CPSC 312 Projects. Use this for both your proposal and final project submission.
-
-(Since you are submitting a link to a specific commit, we will be able to tell the difference.)
-
-The template to edit begins below. You can delete this header section once you've begun.
-
-We will post some additional material to include when you reach the final project stage.
-
 # BattleShips
 
-
-We will be re-creating the classic popular board game of BattleShips. Playable through the command line
+We will be re-creating the classic popular board game of Battleship, making it playable through the command line
 over the internet.
 
 This project is in fulfillment of the [CPSC 312 2021W1 project requirements](https://steven-wolfman.github.io/cpsc-312-website/project.html).
@@ -100,23 +89,36 @@ A good goal to aim for is the top rubric item from proposal grading:
 > Fully functional proof-of-concept is easy to use and review, and it clearly demonstrates a key element necessary for the overall project.
 
 
+### Draft
+
+Our proof of concept is, at minimum, opening a socket and listening for connections, accepting a connection, sending a message, and closing the socket.
+
+This addresses the networking component of our project, which one of the more complicated aspects of our idea since networking is a side-effect and Haskell is pure. Without networking, our project is reduced to a basic, local representation of Battlehip through the command line. That's just boring. With networking, two players can be anywhere in the world and still connect to each other for a game. That's pretty cool!
+
+Now that we have a basic working server/socket accepting connections, we are confident that we can implement all the necessary networking (client, expanded server) to create a simple, turn-based, networking applicaiton that allows us to initialize a game state and send updates between the players.
+
+Server socket creation: This function is the entry point to the server. It binds several helpers together.
+https://github.students.cs.ubc.ca/grantms/cpsc-312-battleship/blob/6699968a3e07c5593f941c5d537627dd901012a7/pvp-battleship/src/Lib.hs#L38  
+
+This function gets the proper info to create the socket, like the address family, which addresses to accept connections from, etc.  
+https://github.students.cs.ubc.ca/grantms/cpsc-312-battleship/blob/6699968a3e07c5593f941c5d537627dd901012a7/pvp-battleship/src/Lib.hs#L11
+
+This function creates the socket, sets some options like one for easier port reuse, binds the socket to the port, and listens for incoming connections.
+https://github.students.cs.ubc.ca/grantms/cpsc-312-battleship/blob/6699968a3e07c5593f941c5d537627dd901012a7/pvp-battleship/src/Lib.hs#L20
+
+This function accepts a connection, sends "Hello World!" to it, and closes the socket.
+https://github.students.cs.ubc.ca/grantms/cpsc-312-battleship/blob/6699968a3e07c5593f941c5d537627dd901012a7/pvp-battleship/src/Lib.hs#L31
 
 ### How to test and run the code: Haskell
 
-Replace this section with instructions to us for how to test and run your code.
+**Since our proof of concept sets up a socket, the best way to test it is running our program and connecting with a network utility like netcat.**
 
-As it is currently set up, editing works best if you first `cd` into the `haskell` subdirectory and open VS Code on that directory (`code .`). There is a `Makefile` with some helpful aliases, but you can also just use `stack` as normal.
+> Note: To fully see a connection, this should be done on the department's Linux servers or a Mac. While the Network.Socket Module works with Windows via msys, connecting to the opened port with a tool like netcat works most easily on Linux or Unix. On Windows/without netcat, you will only be able to see the print statements that occur after networking functions have been called and completed without throwing errors rather than the message sent when a connection is made.
 
-Note: We expect to be able to test your code by running `stack test`. Included among your tests should be some that demonstrate the core functionality of your code. (We will be running `make haskell-eval` from the project root.)
+1. Clone this repo onto a Mac or a department Linux server. From inside the main directory, `cd haskell`
+2. Run `stack build` and then `stack exec battleship-exe`
+3. On another terminal on the same machine (for the simplicity of using 'localhost' rather than identifying the ip address of the server), run `nc localhost 3000`
+4. Observe the message sent to the client!
+> Note that the use of `localhost` still indicates a true network connection has been created, as the traffic is still traveling down through the Transport layer to the IP layer and back up.
 
-We should be able to further explore your code's functionality by running `stack ghci`, and you should instruct us on some interesting cases to try.
-
-If you include instructions different from these, be **absolutely sure** that they will work well for us in whatever environment we run your code and that they will be as easy to use as the instructions above!
-
-### How to test and run the code: Prolog
-
-Replace this section with instructions to us for how to test and run your code.
-
-Instructions coming soon, but we expect you'll use the [Prolog Unit Testing](https://www.swi-prolog.org/pldoc/doc_for?object=section(%27packages/plunit.html%27)) library for testing and that we'll be able to run your code with `swipl`.
-
-
+You can still run `make haskell-eval` from root or `stack test`, but because it is hard (not possible?) to test a network connection with Tasty, there are no informative tests as of yet.

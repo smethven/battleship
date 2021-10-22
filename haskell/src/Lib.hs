@@ -31,16 +31,14 @@ acceptConn :: Socket -> IO ()
 acceptConn sock = E.bracketOnError (accept sock) (close . fst) respond
     where respond (connection, _peer) = do {
         ; putStrLn "Connected to client!"
-        -- ; msg <- recv connection 1024
-        -- ; sendAll connection msg
         ; sendAll connection (C.pack "Hello World")
     }
 
 createSocket :: IO ()
 createSocket = do {
     ; putStrLn "!!! To test proof of concept: !!!"
-    ; putStrLn "Run on the CS department Linux servers, and on the same server in a different terminal run 'nc localhost 3000'."
-    ; putStrLn "Note: Running nc on the same server is only for the convenience of using 'localhost' instead of finding the proper IP address. It still demonstrates a proper network/socket connection."
+    ; putStrLn "Run on the CS department Linux servers or a Mac, and on the same server/Mac in a different terminal run 'nc localhost 3000'."
+    ; putStrLn "Note: Running nc on the same server/Mac is only for the convenience of using 'localhost' instead of finding the proper IP address. It still demonstrates a proper network/socket connection. While the the Network.Socket package should work on Windows, nc seems to struggle to connect to Windows sockets."
     ; putStrLn ""
     ; addr <- resolve
     ; putStrLn "Resolved AddrInfo struct"

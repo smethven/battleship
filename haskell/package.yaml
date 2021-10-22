@@ -1,5 +1,5 @@
 # TODO: Replace `my-project` everywhere in this file with your project name.
-name:                pvp-battleship
+name:                battleship
 version:             0.1.0.0
 
 dependencies:
@@ -11,7 +11,7 @@ library:
   source-dirs: src
 
 executables:
-  pvp-battleship-exe:
+  battleship-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -19,10 +19,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - pvp-battleship
+    - battleship
 
 tests:
-  pvp-battleship-test:
+  battleship-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -30,6 +30,6 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - pvp-battleship
+    - battleship
     - tasty
     - tasty-hunit
