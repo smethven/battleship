@@ -57,5 +57,3 @@ https://github.students.cs.ubc.ca/grantms/cpsc-312-battleship/blob/71a39d40e931e
 3. On another terminal on the same machine (for the simplicity of using 'localhost' rather than identifying the ip address of the server), run `nc localhost 3000`
 4. Observe the message sent to the client!
 > Note that the use of `localhost` still indicates a true network connection has been created, as the traffic is still traveling down through the Transport layer to the IP layer and back up.
-
-You can still run `make haskell-eval` from root or `stack test`, but because it is hard (not possible?) to test a network connection with Tasty, there are no informative tests as of yet.
