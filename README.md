@@ -1,13 +1,3 @@
-# CPSC 312 Project
-
-Project Template for CPSC 312 Projects. Use this for both your proposal and final project submission.
-
-(Since you are submitting a link to a specific commit, we will be able to tell the difference.)
-
-The template to edit begins below. You can delete this header section once you've begun.
-
-We will post some additional material to include when you reach the final project stage.
-
 # BattleShips
 
 
@@ -29,26 +19,6 @@ We call ourselves: BattleShips
 
 ## Product Pitch
 
-
-Replace this with a pitch for your project and the problem it solves. This is your vision for what the project
-would like like as a complete product, ready for awesome action. (Yes, awesomeness seems to be a theme.)
-It may be as short as a couple of paragraphs, or it may be longer. It should **definitely** take less than 4 minutes
-to read carefully and thoroughly.
-
-Be sure that this touches clearly on the [project requirements](https://steven-wolfman.github.io/cpsc-312-website/project.html#project-requirements).
-
-Good goals to aim for are from the top two rubric items for proposal grading:
-
-> Exciting and language-appropriate product idea tackling a problem that is clearly compelling to a significant audience.
-
-Or:
-
-> Solid and language-appropriate product idea with a problem that is of real interest to the submitting team.
-
-(It's easy to focus on the product and not the problem. Remember to include both!)
-
-DRAFT:
-
 The Problem: We all know how fun it is to sink your friend’s battleship on game night, but what if we were living in a dystopian future where a virus has caused a global pandemic, and game night is never the same again. You must quarantine to keep safe but the human psyche relies on connections with others in order to keep sane. You haven’t sunk your friend’s battleship in weeks and you feel your sense of sanity slipping away. You just wish you could play your favourite game with your friend to connect without compromising on safety.
 
 The Solution: Online battleship. We will harness the power of the internet to create an online battleship game. Our product will allow two people to connect from anywhere in the world, whether they are quarantining or simply separated by land and sea. No longer will game night or your sanity need to be compromised. Hosted on a website, our product with have a visually exciting UI complete with animated graphics of battleships sinking. It will also have a chat feature to fully support a game night experience. Written in Haskell, this product expands on our 312 learning by applying what we learned in Lecture 5 about representing games, and expanding it by incorporating networking to allow a multiplayer game.
@@ -56,22 +26,10 @@ The Solution: Online battleship. We will harness the power of the internet to cr
 
 ## Minimal Viable Project
 
-Replace this with a description of the minimal viable project you will actually build for CPSC 312 (if this becomes your final project).
-It may be as short as a few paragraphs, or it may be longer. It should **definitely** take less than 4 minutes
-to read carefully and thoroughly.
-
 Make clear:
 + how this builds meaningfully toward your product pitch above, without being nearly as much work,
 + how it builds on the strength and power of the language, and
 + how it leads naturally to learning and applying some new element of the language (including what that element is!)
-
-Good goals to aim for are from the top two rubric items for proposal grading:
-
-> The minimal viable project (MVP) builds on the strengths and power of the language in exciting ways that will clearly lead to excellent learning for students.
-
-Or:
-
-> The MVP clearly builds significantly on the language and will lead in interesting and natural ways to learning for the students.
 
 Our MVP will be a command line game in which a user will be able to play a game of battleships, through the internet.
 We will have create a standard language in which users can interface with our game and get feedback on the result of their move.
