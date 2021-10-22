@@ -73,6 +73,10 @@ Or:
 
 > The MVP clearly builds significantly on the language and will lead in interesting and natural ways to learning for the students.
 
+Our MVP will be a command line game in which a user will be able to play a game of battleships, through the internet.
+We will have create a standard language in which users can interface with our game and get feedback on the result of their move. 
+Additionally we will communicate and maintain consistency between the two players game states throughout play.
+
 ## Proof of Concept
 
 Replace this with a description of your proof-of-concept. This may be as short as a few paragraphs, or it may be longer.
@@ -85,6 +89,7 @@ Tell us:
 + what makes that such an important element
 + how completing this gives you confidence that, with sufficient work, you could complete the full (minimal viable) project
 
+
 Include links (likely even line-level links, which are easy to create in Github) throughout to critical pieces of
 the code to make it easy for us to understand what you've accomplished and how it fulfills the requirements.
 
@@ -93,6 +98,8 @@ Also include instructions for us to test and run your code. (See our guidelines 
 A good goal to aim for is the top rubric item from proposal grading:
 
 > Fully functional proof-of-concept is easy to use and review, and it clearly demonstrates a key element necessary for the overall project.
+
+
 
 ### How to test and run the code: Haskell
 
