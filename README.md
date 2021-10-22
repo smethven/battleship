@@ -35,16 +35,16 @@ This addresses the networking component of our project. Without networking, our 
 Now that we have a basic working server/socket accepting connections, we are confident that we can implement all the necessary networking (client, expanded server) to create a simple, turn-based, networking applicaiton that allows us to initialize a game state and send updates between the players.
 
 Server socket creation: This function is the entry point to the server. It binds several helpers together.
-https://github.students.cs.ubc.ca/grantms/cpsc-312-battleship/blob/6699968a3e07c5593f941c5d537627dd901012a7/pvp-battleship/src/Lib.hs#L38  
+https://github.students.cs.ubc.ca/grantms/cpsc-312-battleship/blob/71a39d40e931e1fd329b050ef5b5ef5eddd7a31e/haskell/src/Lib.hs#L38
 
 This function gets the proper info to create the socket, like the address family, which addresses to accept connections from, etc.  
-https://github.students.cs.ubc.ca/grantms/cpsc-312-battleship/blob/6699968a3e07c5593f941c5d537627dd901012a7/pvp-battleship/src/Lib.hs#L11
+https://github.students.cs.ubc.ca/grantms/cpsc-312-battleship/blob/71a39d40e931e1fd329b050ef5b5ef5eddd7a31e/haskell/src/Lib.hs#L11
 
 This function creates the socket, sets some options like one for easier port reuse, binds the socket to the port, and listens for incoming connections.
-https://github.students.cs.ubc.ca/grantms/cpsc-312-battleship/blob/6699968a3e07c5593f941c5d537627dd901012a7/pvp-battleship/src/Lib.hs#L20
+https://github.students.cs.ubc.ca/grantms/cpsc-312-battleship/blob/71a39d40e931e1fd329b050ef5b5ef5eddd7a31e/haskell/src/Lib.hs#L20
 
 This function accepts a connection, sends "Hello World!" to it, and closes the socket.
-https://github.students.cs.ubc.ca/grantms/cpsc-312-battleship/blob/6699968a3e07c5593f941c5d537627dd901012a7/pvp-battleship/src/Lib.hs#L31
+https://github.students.cs.ubc.ca/grantms/cpsc-312-battleship/blob/71a39d40e931e1fd329b050ef5b5ef5eddd7a31e/haskell/src/Lib.hs#L31
 
 ### How to test and run the code: Haskell
 
