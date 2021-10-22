@@ -35,6 +35,10 @@ acceptConn sock = E.bracketOnError (accept sock) (close . fst) respond
 
 createSocket :: IO ()
 createSocket = do {
+    ; putStrLn "!!! To test proof of concept: !!!"
+    ; putStrLn "Run on the CS department Linux servers, and on the same server in a different terminal run 'nc localhost 3000'."
+    ; putStrLn "Note: Running nc on the same server is only for the convenience of using 'localhost' instead of finding the proper IP address. It still demonstrates a proper network/socket connection."
+    ; putStrLn ""
     ; addr <- resolve
     ; putStrLn "Resolved AddrInfo struct"
     ; E.bracket (open addr) close acceptConn
