@@ -5,7 +5,7 @@ import Network.Socket.ByteString (recv, sendAll)
 import qualified Data.ByteString.Char8 as C
 import qualified Control.Exception as E
 
-{- server socket creation adapted from https://hackage.haskell.org/package/network-3.1.2.5/docs/Network-Socket.html#g:1 -}
+{- server socket creation adapted from https://hackage.haskell.org/package/network-3.1.2.5/docs/Network-Socket.html -}
 
 resolve :: IO AddrInfo
 resolve = do {
@@ -13,8 +13,11 @@ resolve = do {
     ; head <$> getAddrInfo hints Nothing (Just "3000")
 }
 
+openSocket :: AddrInfo -> IO Socket
+openSocket addr = socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr)
+
 open :: AddrInfo -> IO Socket
-open addr = E.bracketOnError (socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr)) close (\sock -> do {
+open addr = E.bracketOnError (openSocket addr) close (\sock -> do {
     ; setSocketOption sock ReuseAddr 1
     ; withFdSocket sock setCloseOnExecIfNeeded
     ; bind sock $ addrAddress addr
