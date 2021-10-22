@@ -28,32 +28,9 @@ Our MVP will be a command line game in which a user will be able to play a game 
 
 ## Proof of Concept
 
-Replace this with a description of your proof-of-concept. This may be as short as a few paragraphs, or it may be longer.
-It should **definitely** take less than 4 minutes to read carefully and thoroughly, though working through and running the
-code may take an extra 4 minutes. (Your guidance and links should make it easy for us to work through the code.)
-
-Tell us:
-
-+ what key element of your project the proof-of-concept focuses on
-+ what makes that such an important element
-+ how completing this gives you confidence that, with sufficient work, you could complete the full (minimal viable) project
-
-
-Include links (likely even line-level links, which are easy to create in Github) throughout to critical pieces of
-the code to make it easy for us to understand what you've accomplished and how it fulfills the requirements.
-
-Also include instructions for us to test and run your code. (See our guidelines below.)
-
-A good goal to aim for is the top rubric item from proposal grading:
-
-> Fully functional proof-of-concept is easy to use and review, and it clearly demonstrates a key element necessary for the overall project.
-
-
-### Draft
-
 Our proof of concept is, at minimum, opening a socket and listening for connections, accepting a connection, sending a message, and closing the socket.
 
-This addresses the networking component of our project, which one of the more complicated aspects of our idea since networking is a side-effect and Haskell is pure. Without networking, our project is reduced to a basic, local representation of Battlehip through the command line. That's just boring. With networking, two players can be anywhere in the world and still connect to each other for a game. That's pretty cool!
+This addresses the networking component of our project. Without networking, our project is reduced to a basic, local representation of Battlehip through the command line. That's just boring. With networking, two players can be anywhere in the world and still connect to each other for a game. That's pretty cool!
 
 Now that we have a basic working server/socket accepting connections, we are confident that we can implement all the necessary networking (client, expanded server) to create a simple, turn-based, networking applicaiton that allows us to initialize a game state and send updates between the players.
 
