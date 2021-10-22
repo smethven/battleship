@@ -25,14 +25,7 @@ The Solution: Online battleship. We will harness the power of the internet to cr
 
 ## Minimal Viable Project
 
-Make clear:
-+ how this builds meaningfully toward your product pitch above, without being nearly as much work,
-+ how it builds on the strength and power of the language, and
-+ how it leads naturally to learning and applying some new element of the language (including what that element is!)
-
-Our MVP will be a command line game in which a user will be able to play a game of battleships, through the internet.
-We will have create a standard language in which users can interface with our game and get feedback on the result of their move.
-Additionally we will communicate and maintain consistency between the two players game states throughout play.
+Our MVP will be a command line game in which a user will be able to play a game of battleships, through the internet. Our MVP will set up the game board for our players, and we will create a standard language in which users can interface with our game and get feedback on the result of their move. Additionally we will communicate and maintain consistency between the two players game states throughout play. This meaningfully builds towards our product as we will be creating a fully playable, 2-player game of battleship. We will utilize Haskell’s functional power to represent game states and modify those game states, and we have seen in class that Haskell is great at this task. As we will be making an online multiplayer game, naturally we will learn how to apply networking to Haskell. 
 
 ## Proof of Concept
 
