@@ -41,8 +41,7 @@ data YCoord = N1 | N2 | N3 | N4 | N5 | N6 | N7 | N8 | N9 | N10
 -- your move involves making a guess which would add to either hits or misses list of OpponentGrid, and if it hits then possibly adds to SunkShips list
 -- if you hit then it also affects opponents own grid - adds to opponent's YourGrid misses
 
--- 1 init server game state and 1 init client game state
-
+-- init server game state
 initBattleshipServerState :: BattleshipState
 initBattleshipServerState = BattleshipState initYourGridServer initOpponentGridServer
 
@@ -69,3 +68,31 @@ initDestroyerServer = Ship [(GridSquare H N10), (GridSquare I N10)]
 
 initOpponentGridServer :: OpponentGrid
 initOpponentGridServer = OpponentGrid [] [] []
+
+-- init client game state
+initBattleshipClientState :: BattleshipState
+initBattleshipClientState = BattleshipState initYourGridClient initOpponentGridClient
+
+initYourGridClient :: YourGrid
+initYourGridClient = YourGrid initShipsClient []
+
+initShipsClient :: [Ship]
+initShipsClient = [initCarrierClient, initBattleshipClient, initCruiserClient, initSubmarineClient, initDestroyerClient]
+
+initCarrierClient :: Ship
+initCarrierClient = Ship [(GridSquare C N1), (GridSquare C N2), (GridSquare C N3), (GridSquare C N4), (GridSquare C N5)]
+
+initBattleshipClient :: Ship
+initBattleshipClient = Ship [(GridSquare J N1), (GridSquare J N2), (GridSquare J N3), (GridSquare J N4)]
+
+initCruiserClient :: Ship
+initCruiserClient = Ship [(GridSquare A N7), (GridSquare B N7), (GridSquare C N7)]
+
+initSubmarineClient :: Ship
+initSubmarineClient = Ship [(GridSquare A N9), (GridSquare B N9), (GridSquare C N9)]
+
+initDestroyerClient :: Ship
+initDestroyerClient = Ship [(GridSquare G N6), (GridSquare H N6)]
+
+initOpponentGridClient :: OpponentGrid
+initOpponentGridClient = OpponentGrid [] [] []
