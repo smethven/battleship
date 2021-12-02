@@ -27,7 +27,20 @@ data YourGrid = YourGrid [Ship] [GridSquare]
 data OpponentGrid = OpponentGrid [Ship] [GridSquare] [GridSquare]
     deriving (Eq, Ord, Read, Show)
 
--- a well-formed ship has all gridsquares in a line
+-- Well formed ship is straight and connected
+-- straight
+    -- Either XCoord or YCoord is all the same
+-- connected
+    -- Whichever is not the same must be able to be sorted
+    -- and then ascending or descending without break
+    -- e.g. C D E
+    -- 5 6 7
+-- E.g. Ship [Coord A 3, Coord A 5, Coord A 4]
+-- Sorted by the changing type of YCoord
+-- Ship [Coord A 3, Coord A 4, Coord A 5]
+-- X Cord is repeating and YCord is contiguous (no repeats)
+
+-- no repeats maybe a set would be better
 data Ship = Ship [GridSquare]
     deriving (Eq, Ord, Read, Show)
 
