@@ -71,6 +71,8 @@ data Attack = GridSquare
 -- Response Attacked Hit SunkShip WonGame
 data Response = Response GridSquare Bool Bool Bool
 
+data UpdateType = ShipSquare | Hit | Miss
+
 -- Constants
 serverStartState :: GameState
 serverStartState = GameState serverBattleshipState serverBoardView
@@ -82,7 +84,7 @@ serverPlayerState :: PlayerState
 serverPlayerState = PlayerState [] [] -- TODO stub
 
 serverBoardView :: BoardView
-serverBoardView = BV (buildBoard serverPlayerState) emptyBoard
+serverBoardView = BV (buildNewBoard serverPlayerState) emptyBoard
 
 clientStartState :: GameState
 clientStartState = GameState clientBattleshipState clientBoardView
@@ -91,10 +93,13 @@ clientBattleshipState :: BattleshipState
 clientBattleshipState = BSS clientPlayerState []
 
 clientPlayerState :: PlayerState
-clientPlayerState = PlayerState [] [] -- TODO stub
+-- clientPlayerState = PlayerState [] [] -- TODO stub
+clientPlayerState = PlayerState [Ship [Square A One, Square A Two, Square A Three],
+                                 Ship [Square C One, Square D One, Square E One],
+                                 Ship [Square J Five, Square I Five]] [] -- stub
 
 clientBoardView :: BoardView
-clientBoardView = BV (buildBoard serverPlayerState) emptyBoard
+clientBoardView = BV (buildNewBoard clientPlayerState) emptyBoard
 
 emptyBoard :: Board
 emptyBoard = Board sea
@@ -134,24 +139,33 @@ updateBSSOnResponse :: GridSquare -> BattleshipState -> BattleshipState
 updateBSSOnResponse (Square x y) (BSS state attacks) = BSS state (Square x y:attacks)
 
 updateBVOnRepsonse :: GridSquare -> Bool -> BoardView -> BoardView
-updateBVOnRepsonse square hit (BV playerBoard oppBoard) =
-  BV playerBoard (updateBoardOnResponse square hit oppBoard)
+updateBVOnRepsonse square hit (BV playerBoard (Board oppLines)) =
+  BV playerBoard (Board (updateBoard square update oppLines))
+    where  update = if hit then Hit else Miss
 
-updateBoardOnResponse :: GridSquare -> Bool -> Board -> Board
-updateBoardOnResponse _ _ (Board []) = Board []
-updateBoardOnResponse (Square xCoord Zero) hit (Board (l:lines)) =
-  Board (updateLine x hit l:lines)
-    where x = fromEnum xCoord
-updateBoardOnResponse (Square xCoord yCoord) hit (Board (l:lines)) =
-  updateBoardOnResponse (Square xCoord (pred yCoord)) hit (Board (l:lines))
+updateBoard :: GridSquare -> UpdateType -> [[String]] -> [[String]]
+updateBoard _ _ [] = []
+updateBoard (Square xCoord Zero) update (l:lines) = updateLine x update l:lines
+  where x = fromEnum xCoord
+updateBoard (Square xCoord yCoord) update (l:lines) =
+  l:updateBoard (Square xCoord (pred yCoord)) update lines
 
-updateLine :: Int -> Bool -> [String] -> [String]
+updateLine :: Int -> UpdateType -> [String] -> [String]
 updateLine _ _ [] = []
-updateLine 0 hit (_:rest) = (if hit then "X" else "O"):rest
-updateLine x hit line = updateLine (x-1) hit line
+updateLine 0 Hit (_:rest) = "X":rest
+updateLine 0 Miss (_:rest) = "O":rest
+updateLine 0 ShipSquare (_:rest) = "S":rest
+updateLine x hit (l:rest) = l:updateLine (x-1) hit rest
 
-buildBoard :: PlayerState -> Board
-buildBoard _ = undefined -- TODO stub
+buildNewBoard :: PlayerState -> Board
+buildNewBoard (PlayerState ships _) = buildOnBoard ships emptyBoard
+  where buildOnBoard [] board = board
+        buildOnBoard (ship:ships) board = createShip ship (buildOnBoard ships board)
+
+createShip :: Ship -> Board -> Board
+createShip (Ship []) board = board
+createShip (Ship (sqr:sqrs)) (Board lines) = Board (updateBoard sqr ShipSquare updatedLines)
+  where (Board updatedLines) = createShip (Ship sqrs) (Board lines)
 
 showBoards :: BoardView -> String
 showBoards (BV player opponent) = unlines [boardViewHeader, boardHeader,
@@ -172,4 +186,24 @@ combineLines y (Board playerLines) (Board oppLines) =
   where head = [show (fromEnum y)]
         coord = fromEnum y
         playerLine = playerLines!!coord
-        opponentLine = playerLines!!coord
+        opponentLine = oppLines!!coord
+
+
+testBoardView :: BoardView
+testBoardView = BV testBoard testBoard
+
+testBoard :: Board
+testBoard = Board [["S", "~", "S", "S", "S", "~", "~", "~", "~", "~"],
+                   ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
+                   ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
+                   ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
+                   ["~", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
+                   ["~", "~", "~", "~", "X", "X", "X", "~", "~", "~"],
+                   ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"],
+                   ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"],
+                   ["~", "~", "~", "~", "~", "~", "~", "S", "S", "~"],
+                   ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"]]
+                   
+testLines :: [[String]]
+testLines = lines
+  where (Board lines) = testBoard
