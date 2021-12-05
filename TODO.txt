@@ -1,0 +1,9 @@
+TODO:
+
+Game state, moves (involves researching actual battleship game state!)
+Serialization (and parsing) of data
+client creation
+server finishing
+TESTING
+ - all parts individually!
+"user interaction" overhead (messages, choosing options like server vs client, etc)
