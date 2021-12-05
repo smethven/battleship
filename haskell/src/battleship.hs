@@ -53,20 +53,20 @@ data PlayerState = PlayerState [Ship] [GridSquare]
 data Ship = Ship [GridSquare]
 
 data GridSquare = Square XCoord YCoord
-  deriving (Eq, Show)
+  deriving (Eq, Show, Read)
 
 data XCoord = A | B | C | D | E | F | G | H | I | J
-  deriving (Bounded, Enum, Show, Eq, Ord)
+  deriving (Bounded, Enum, Show, Read, Eq, Ord)
 data YCoord = Zero | One | Two | Three | Four | Five | Six | Seven | Eight | Nine
-  deriving (Bounded, Enum, Show, Eq, Ord)
+  deriving (Bounded, Enum, Show, Read, Eq, Ord)
 
 -- BV YourBoard OpponentBoard
 data BoardView = BV [[String]] [[String]]
 
-data Attack = GridSquare
-
 -- Response Attacked Hit SunkShip WonGame
 data Response = Response GridSquare Bool Bool Bool
+  deriving (Show, Read)
+data Attack = GridSquare
 
 data UpdateType = ShipSquare | Hit | Miss
 
