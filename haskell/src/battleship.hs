@@ -61,10 +61,7 @@ data YCoord = Zero | One | Two | Three | Four | Five | Six | Seven | Eight | Nin
   deriving (Bounded, Enum, Show, Eq, Ord)
 
 -- BV YourBoard OpponentBoard
-data BoardView = BV Board Board
-
--- board is a list of rows
-data Board = Board [[String]]
+data BoardView = BV [[String]] [[String]]
 
 data Attack = GridSquare
 
@@ -101,9 +98,8 @@ clientPlayerState = PlayerState [Ship [Square A One, Square A Two, Square A Thre
 clientBoardView :: BoardView
 clientBoardView = BV (buildNewBoard clientPlayerState) emptyBoard
 
-emptyBoard :: Board
-emptyBoard = Board sea
-  where sea = replicate 10 (replicate 10 "~")
+emptyBoard :: [[String]]
+emptyBoard = replicate 10 (replicate 10 "~")
 
 boardWidth :: Int
 boardWidth = 21
@@ -139,8 +135,8 @@ updateBSSOnResponse :: GridSquare -> BattleshipState -> BattleshipState
 updateBSSOnResponse (Square x y) (BSS state attacks) = BSS state (Square x y:attacks)
 
 updateBVOnRepsonse :: GridSquare -> Bool -> BoardView -> BoardView
-updateBVOnRepsonse square hit (BV playerBoard (Board oppLines)) =
-  BV playerBoard (Board (updateBoard square update oppLines))
+updateBVOnRepsonse square hit (BV playerBoard oppBoard) =
+  BV playerBoard (updateBoard square update oppBoard)
     where  update = if hit then Hit else Miss
 
 updateBoard :: GridSquare -> UpdateType -> [[String]] -> [[String]]
@@ -157,15 +153,15 @@ updateLine 0 Miss (_:rest) = "O":rest
 updateLine 0 ShipSquare (_:rest) = "S":rest
 updateLine x hit (l:rest) = l:updateLine (x-1) hit rest
 
-buildNewBoard :: PlayerState -> Board
+buildNewBoard :: PlayerState -> [[String]]
 buildNewBoard (PlayerState ships _) = buildOnBoard ships emptyBoard
   where buildOnBoard [] board = board
         buildOnBoard (ship:ships) board = createShip ship (buildOnBoard ships board)
 
-createShip :: Ship -> Board -> Board
+createShip :: Ship -> [[String]] -> [[String]]
 createShip (Ship []) board = board
-createShip (Ship (sqr:sqrs)) (Board lines) = Board (updateBoard sqr ShipSquare updatedLines)
-  where (Board updatedLines) = createShip (Ship sqrs) (Board lines)
+createShip (Ship (sqr:sqrs)) lines = updateBoard sqr ShipSquare updatedLines
+  where updatedLines = createShip (Ship sqrs) lines
 
 showBoards :: BoardView -> String
 showBoards (BV player opponent) = unlines [boardViewHeader, boardHeader,
@@ -180,8 +176,8 @@ showBoards (BV player opponent) = unlines [boardViewHeader, boardHeader,
                                            combineLines Eight player opponent,
                                            combineLines Nine player opponent]
 
-combineLines :: YCoord -> Board -> Board -> String
-combineLines y (Board playerLines) (Board oppLines) =
+combineLines :: YCoord -> [[String]] -> [[String]] -> String
+combineLines y playerLines oppLines =
   unwords $ head ++ playerLine ++ replicate boardSpacerSize " " ++ head ++ opponentLine
   where head = [show (fromEnum y)]
         coord = fromEnum y
@@ -192,18 +188,14 @@ combineLines y (Board playerLines) (Board oppLines) =
 testBoardView :: BoardView
 testBoardView = BV testBoard testBoard
 
-testBoard :: Board
-testBoard = Board [["S", "~", "S", "S", "S", "~", "~", "~", "~", "~"],
-                   ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
-                   ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
-                   ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
-                   ["~", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
-                   ["~", "~", "~", "~", "X", "X", "X", "~", "~", "~"],
-                   ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"],
-                   ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"],
-                   ["~", "~", "~", "~", "~", "~", "~", "S", "S", "~"],
-                   ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"]]
-                   
-testLines :: [[String]]
-testLines = lines
-  where (Board lines) = testBoard
+testBoard :: [[String]]
+testBoard = [["S", "~", "S", "S", "S", "~", "~", "~", "~", "~"],
+             ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
+             ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
+             ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
+             ["~", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
+             ["~", "~", "~", "~", "X", "X", "X", "~", "~", "~"],
+             ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"],
+             ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"],
+             ["~", "~", "~", "~", "~", "~", "~", "S", "S", "~"],
+             ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"]]
