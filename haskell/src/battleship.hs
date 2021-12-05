@@ -1,4 +1,6 @@
--- Battleship are two 10*10 grids, x-axis: A-J, y-axis: 1-10
+module Battleship where
+
+-- Battleship are two 10*10 grids, x-axis: A-J, y-axis: 0-9
 
 -- One grid is your own battleships described by:
 -- location of ships
@@ -17,34 +19,11 @@
 -- 1 submarine: 3 squares long
 -- 1 destroyer: 2 squares long
 
--- data BattleshipState = BattleshipState YourGrid OpponentGrid
-
--- YourGrid [Ships] [Hits]
--- data YourGrid = YourGrid [Ship] [GridSquare]
-
--- OpponentGrid [SunkShips] [Hits] [Misses]
--- data OpponentGrid = OpponentGrid [Ship] [GridSquare] [GridSquare]
-
--- a well-formed ship has all gridsquares in a line
--- data Ship = Ship [GridSquare]
-
--- data GridSquare = GridSquare XCoord YCoord
-
--- data XCoord = A | B | C | D | E | F | G | H | I | J
---  deriving (Bounded, Enum, Show)
--- data YCoord = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
---  deriving (Bounded, Enum, Show)
-
 -- your move involves making a guess which would add to either hits or misses list of OpponentGrid, and if it hits then possibly adds to SunkShips list
 -- if you hit then it also affects opponents own grid - adds to opponent's YourGrid misses
 
 -- 1 init server game state and 1 init client game state
 
--- module Lib ( BattleshipState ) where
---   Grid =
---   type Coord = (Int, Int)
-
-data Ship = Ship [GridSquare]
 -- Well formed ship is straight and connected
 -- straight
     -- Either XCoord or YCoord is all the same
@@ -60,9 +39,137 @@ data Ship = Ship [GridSquare]
 
 -- no repeats maybe a set would be better
 
-data GridSquare = GridSquare XCoord YCoord
+
+-- GameState BattleshipState BoardView
+data GameState = GameState BattleshipState BoardView
+
+-- BattleshipState YourState [PreviousAttacks]
+data BattleshipState = BSS PlayerState [GridSquare]
+
+-- YourGrid [Ships] [Hits]
+data PlayerState = PlayerState [Ship] [GridSquare]
+
+-- a well-formed ship has all gridsquares in a line
+data Ship = Ship [GridSquare]
+
+data GridSquare = Square XCoord YCoord
+  deriving (Eq, Show)
 
 data XCoord = A | B | C | D | E | F | G | H | I | J
-  deriving (Bounded, Enum, Show)
-data YCoord = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
-  deriving (Bounded, Enum, Show)
+  deriving (Bounded, Enum, Show, Eq, Ord)
+data YCoord = Zero | One | Two | Three | Four | Five | Six | Seven | Eight | Nine
+  deriving (Bounded, Enum, Show, Eq, Ord)
+
+-- BV YourBoard OpponentBoard
+data BoardView = BV Board Board
+
+-- board is a list of rows
+data Board = Board [[String]]
+
+data Attack = GridSquare
+
+-- Response Attacked Hit SunkShip WonGame
+data Response = Response GridSquare Bool Bool Bool
+
+-- Constants
+serverStartState :: GameState
+serverStartState = GameState serverBattleshipState serverBoardView
+
+serverBattleshipState :: BattleshipState
+serverBattleshipState = BSS serverPlayerState []
+
+serverPlayerState :: PlayerState
+serverPlayerState = PlayerState [] [] -- TODO stub
+
+serverBoardView :: BoardView
+serverBoardView = BV (buildBoard serverPlayerState) emptyBoard
+
+clientStartState :: GameState
+clientStartState = GameState clientBattleshipState clientBoardView
+
+clientBattleshipState :: BattleshipState
+clientBattleshipState = BSS clientPlayerState []
+
+clientPlayerState :: PlayerState
+clientPlayerState = PlayerState [] [] -- TODO stub
+
+clientBoardView :: BoardView
+clientBoardView = BV (buildBoard serverPlayerState) emptyBoard
+
+emptyBoard :: Board
+emptyBoard = Board sea
+  where sea = replicate 10 (replicate 10 "~")
+
+boardWidth :: Int
+boardWidth = 21
+
+boardSpacerSize :: Int
+boardSpacerSize = 5
+
+headerSpacerSize :: Int
+headerSpacerSize = boardSpacerSize + 16
+
+boardViewHeader :: String
+boardViewHeader = "Your Board:" ++ replicate headerSpacerSize ' ' ++ "Opponent's Board:"
+
+boardHeader :: String
+boardHeader = unwords $ spacer ++ header ++ replicate boardSpacerSize " " ++ spacer ++ header
+  where header = map show [A ..J]
+        spacer = [" "]
+
+totalShipLength :: Int
+totalShipLength = 17
+
+
+-- Functions
+wonGame :: GameState -> Bool
+wonGame (GameState (BSS playerState attacks) bv) = length hits == totalShipLength
+  where (PlayerState ships hits) = playerState
+
+updateOnResponse :: Response -> GameState -> GameState
+updateOnResponse (Response square hit sunk won) (GameState bss bv) =
+  GameState (updateBSSOnResponse square bss) (updateBVOnRepsonse square hit bv)
+
+updateBSSOnResponse :: GridSquare -> BattleshipState -> BattleshipState
+updateBSSOnResponse (Square x y) (BSS state attacks) = BSS state (Square x y:attacks)
+
+updateBVOnRepsonse :: GridSquare -> Bool -> BoardView -> BoardView
+updateBVOnRepsonse square hit (BV playerBoard oppBoard) =
+  BV playerBoard (updateBoardOnResponse square hit oppBoard)
+
+updateBoardOnResponse :: GridSquare -> Bool -> Board -> Board
+updateBoardOnResponse _ _ (Board []) = Board []
+updateBoardOnResponse (Square xCoord Zero) hit (Board (l:lines)) =
+  Board (updateLine x hit l:lines)
+    where x = fromEnum xCoord
+updateBoardOnResponse (Square xCoord yCoord) hit (Board (l:lines)) =
+  updateBoardOnResponse (Square xCoord (pred yCoord)) hit (Board (l:lines))
+
+updateLine :: Int -> Bool -> [String] -> [String]
+updateLine _ _ [] = []
+updateLine 0 hit (_:rest) = (if hit then "X" else "O"):rest
+updateLine x hit line = updateLine (x-1) hit line
+
+buildBoard :: PlayerState -> Board
+buildBoard _ = undefined -- TODO stub
+
+showBoards :: BoardView -> String
+showBoards (BV player opponent) = unlines [boardViewHeader, boardHeader,
+                                           combineLines Zero player opponent,
+                                           combineLines One player opponent,
+                                           combineLines Two player opponent,
+                                           combineLines Three player opponent,
+                                           combineLines Four player opponent,
+                                           combineLines Five player opponent,
+                                           combineLines Six player opponent,
+                                           combineLines Seven player opponent,
+                                           combineLines Eight player opponent,
+                                           combineLines Nine player opponent]
+
+combineLines :: YCoord -> Board -> Board -> String
+combineLines y (Board playerLines) (Board oppLines) =
+  unwords $ head ++ playerLine ++ replicate boardSpacerSize " " ++ head ++ opponentLine
+  where head = [show (fromEnum y)]
+        coord = fromEnum y
+        playerLine = playerLines!!coord
+        opponentLine = playerLines!!coord
