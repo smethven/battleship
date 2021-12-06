@@ -1,4 +1,4 @@
-module Battleship where
+module Gamestate where
 
 import Text.Read (readMaybe)
 
@@ -184,12 +184,15 @@ lostGame :: GameState -> Bool
 lostGame (GameState (BSS playerState attacks) bv) = length hits == totalShipLength
   where (PlayerState ships hits) = playerState
 
+updateOnAttack :: Attack -> GameState -> GameState
+updateOnAttack _ _ = undefined -- TODO
+
 updateOnResponse :: Response -> GameState -> GameState
 updateOnResponse (Response square hit sunk won) (GameState bss bv) =
   GameState (updateBSSOnResponse square bss) (updateBVOnRepsonse square hit bv)
 
 updateBSSOnResponse :: GridSquare -> BattleshipState -> BattleshipState
-updateBSSOnResponse (Square x y) (BSS state attacks) = BSS state (Square x y:attacks)
+updateBSSOnResponse attack (BSS state attacks) = BSS state (attack:attacks)
 
 updateBVOnRepsonse :: GridSquare -> Bool -> BoardView -> BoardView
 updateBVOnRepsonse square hit (BV playerBoard oppBoard) =
