@@ -7,50 +7,68 @@ import qualified Data.ByteString.Char8 as C
 import Network.Socket
 import Network.Socket.ByteString (recv, sendAll)
 import System.IO (getLine)
+import Battleship --(GameState, Attack, Response, showBoards, parseAttack, updateOnResponse)
 
 {- server socket creation adapted from https://hackage.haskell.org/package/network-3.1.2.5/docs/Network-Socket.html -}
 
 runServer :: Socket -> IO ()
 runServer s = do
-  C.putStrLn (C.pack "Welcome to Battleship!\n")
-  --   TODO: Write any other game init stuff here
-  runGame s
+  putStrLn "Let the battle begin!"
+  runGame s serverStartState
 
-runGame :: Socket -> IO ()
-runGame s = do
-  -- Assuming that the server goes first
-  sendServerAttack s
-  getClientResponse s
-  getClientAttack s
-  sendServerResponse s
-  runGame s
+runGame :: Socket -> GameState -> IO ()
+runGame s gs = do
+  -- The server has the first move
+  gs1 <- sendServerAttack s gs
+  gs2 <- getClientResponse s gs1
+  gs3 <- getClientAttack s gs2
+  gs4 <- sendServerResponse s gs3
+  runGame s gs4
 
 -- Read attack that user passes in and send it to the client
-sendServerAttack :: Socket -> IO ()
-sendServerAttack s = do
+sendServerAttack :: Socket -> GameState -> IO ()
+sendServerAttack s gs = do
+  displayBoards gs
+  putStrLn "Where do we fire, Captain? (Type a letter and a number, separated by a space)"
   msg <- getLine
-  --   TODO: Parse the msg into an coordinate forward it to the client
-  sendAll s (C.pack (msg ++ "\n"))
+  mAttack <- parseAttack msg
+  sendServerAttackHelper s gs mAttack
 
-sendServerResponse :: Socket -> IO ()
-sendServerResponse s = do
-  msg <- getLine
-  --   TODO: Parse the message into a hit or miss and forward it to the client
-  sendAll s (C.pack (msg ++ "\n"))
+sendServerAttackHelper :: Socket -> GameState -> Maybe Attack -> IO ()
+sendServerAttackHelper s gs Nothing = sendServerAttack s gs
+sendServerAttackHelper s gs (Just attack) =
+  if notPrevAttack attack gs then sendAll s (C.pack (show attack)) else sendServerAttack s gs
+
+-- Read the client's response to the server attack
+getClientResponse :: Socket -> GameState -> IO ()
+getClientResponse s gs = do
+  msg <- recv s 1024
+  response <- read msg :: Response
+  gs1 <- updateOnResponse response gs
+  tellResponse response
+  displayBoards gs1
+  --   TODO: Parse the msg into a hit or miss and update game state accordingly
+  C.putStr msg
 
 -- Read the attack that the client sends and update the game state accordingly
-getClientAttack :: Socket -> IO ()
+getClientAttack :: Socket -> GameState -> IO ()
 getClientAttack s = do
   msg <- recv s 1024
   --   TODO: Parse the msg into an coordinate and update game state accordingly
   C.putStr msg
 
--- Read the client's response to the server attack
-getClientResponse :: Socket -> IO ()
-getClientResponse s = do
-  msg <- recv s 1024
-  --   TODO: Parse the msg into a hit or miss and update game state accordingly
-  C.putStr msg
+sendServerResponse :: Socket -> GameState -> IO ()
+sendServerResponse s = do
+  msg <- getLine
+  --   TODO: Parse the message into a hit or miss and forward it to the client
+  sendAll s (C.pack (msg ++ "\n"))
+
+tellResponse :: Response -> IO ()
+tellResponse _ = undefined -- TODO
+
+displayBoards :: GameState -> IO ()
+displayBoards (GameState bss bv) = showBorads bv
+
 
 resolve :: IO AddrInfo
 resolve = do

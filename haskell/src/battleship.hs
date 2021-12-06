@@ -1,5 +1,7 @@
 module Battleship where
 
+import Text.Read (readMaybe)
+
 -- Battleship are two 10*10 grids, x-axis: A-J, y-axis: 0-9
 
 -- One grid is your own battleships described by:
@@ -134,6 +136,9 @@ totalShipLength = 17
 makeAttackFromCoords :: XCoord -> YCoord -> Attack
 makeAttackFromCoords x y = Square x y
 
+notPrevAttack :: Attack -> GameState -> Bool
+notPrevAttack attack (GameState (BSS _ pvAttacks) _) = notElem attack pvAttacks
+
 -- given an attack from opponent, and player's current game state, create response
 makeResponseFromAttack :: Attack -> GameState -> Response
 makeResponseFromAttack attack gs | doesAttackMakeUsLose attack gs = Response attack True True True
@@ -171,8 +176,9 @@ isShipSunk playerState (Ship squares) = (numberOfHitsOnShip squares playerState)
 -- given a ship's gridsquares and a player state, how many hits are on the ship
 numberOfHitsOnShip :: [GridSquare] -> PlayerState -> Int
 numberOfHitsOnShip [] (PlayerState ships hits) = 0
-numberOfHitsOnShip (head:tail) (PlayerState ships hits)| elem head hits = 1 + (numberOfHitsOnShip tail (PlayerState ships hits))
-numberOfHitsOnShip (head:tail) (PlayerState ships hits) = numberOfHitsOnShip tail (PlayerState ships hits)
+numberOfHitsOnShip (head:tail) (PlayerState ships hits)
+  | elem head hits = 1 + numberOfHitsOnShip tail (PlayerState ships hits)
+  | otherwise = numberOfHitsOnShip tail (PlayerState ships hits)
 
 lostGame :: GameState -> Bool
 lostGame (GameState (BSS playerState attacks) bv) = length hits == totalShipLength
@@ -234,6 +240,29 @@ combineLines y playerLines oppLines =
         coord = fromEnum y
         playerLine = playerLines!!coord
         opponentLine = oppLines!!coord
+
+parseAttack :: String -> Maybe Attack
+parseAttack str = maybeAttack maybeX maybeY
+  where [x, y] = words str
+        maybeX = getXCoord x
+        maybeY = getYCoord y
+        
+maybeAttack :: Maybe XCoord -> Maybe YCoord -> Maybe Attack
+maybeAttack Nothing _ = Nothing
+maybeAttack _ Nothing = Nothing
+maybeAttack (Just xcoord) (Just ycoord) = Just (Square xcoord ycoord)
+
+getXCoord :: String -> Maybe XCoord
+getXCoord = readMaybe
+
+getYCoord :: String -> Maybe YCoord
+getYCoord str = toYCoord num
+  where num = readMaybe str :: Maybe Int
+
+toYCoord :: Maybe Int -> Maybe YCoord
+toYCoord Nothing = Nothing
+toYCoord (Just y) | y >= 0 && y < 10 = Just (toEnum y)
+                  | otherwise = Nothing
 
 
 testBoardView :: BoardView
