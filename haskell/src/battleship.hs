@@ -64,9 +64,10 @@ data YCoord = Zero | One | Two | Three | Four | Five | Six | Seven | Eight | Nin
 data BoardView = BV [[String]] [[String]]
 
 -- Response Attacked Hit SunkShip WonGame
+-- A response is a response to an attack that is sent back to the opponent, thus wongame means opponent won game and we lost
 data Response = Response GridSquare Bool Bool Bool
   deriving (Show, Read)
-data Attack = GridSquare
+type Attack = GridSquare
 
 data UpdateType = ShipSquare | Hit | Miss
 
@@ -78,7 +79,11 @@ serverBattleshipState :: BattleshipState
 serverBattleshipState = BSS serverPlayerState []
 
 serverPlayerState :: PlayerState
-serverPlayerState = PlayerState [] [] -- TODO stub
+serverPlayerState = PlayerState [Ship [Square B One, Square C One, Square D One, Square E One, Square F One],
+                                 Ship [Square I One, Square I Two, Square I Three, Square I Four],
+                                 Ship [Square C Three, Square D Three, Square E Three],
+                                 Ship [Square A Six, Square A Seven, Square A Eight],
+                                 Ship [Square H Nine, Square I Nine]] []
 
 serverBoardView :: BoardView
 serverBoardView = BV (buildNewBoard serverPlayerState) emptyBoard
@@ -90,10 +95,11 @@ clientBattleshipState :: BattleshipState
 clientBattleshipState = BSS clientPlayerState []
 
 clientPlayerState :: PlayerState
--- clientPlayerState = PlayerState [] [] -- TODO stub
-clientPlayerState = PlayerState [Ship [Square A One, Square A Two, Square A Three],
+clientPlayerState = PlayerState [Ship [Square C Nine, Square D Nine, Square E Nine, Square F Nine, Square G Nine],
+                                 Ship [Square E Four, Square E Five, Square E Six, Square E Seven],
+                                 Ship [Square A One, Square A Two, Square A Three],
                                  Ship [Square C One, Square D One, Square E One],
-                                 Ship [Square J Five, Square I Five]] [] -- stub
+                                 Ship [Square J Five, Square I Five]] []
 
 clientBoardView :: BoardView
 clientBoardView = BV (buildNewBoard clientPlayerState) emptyBoard
@@ -123,8 +129,53 @@ totalShipLength = 17
 
 
 -- Functions
-wonGame :: GameState -> Bool
-wonGame (GameState (BSS playerState attacks) bv) = length hits == totalShipLength
+
+-- given coords from player, make an attack
+makeAttackFromCoords :: XCoord -> YCoord -> Attack
+makeAttackFromCoords x y = Square x y
+
+-- given an attack from opponent, and player's current game state, create response
+makeResponseFromAttack :: Attack -> GameState -> Response
+makeResponseFromAttack attack gs | doesAttackMakeUsLose attack gs = Response attack True True True
+                                 | doesAttackSinkShip attack gs = Response attack True True False
+                                 | isAttackHit attack gs = Response attack True False False
+                                 | otherwise = Response attack False False False
+
+-- given an attack from opponent, and player's current game state, does the attack sink our last ship and make us lose
+doesAttackMakeUsLose :: Attack -> GameState -> Bool
+doesAttackMakeUsLose attack (GameState (BSS playerState attacks) bv) = (length hits == totalShipLength-1) && (isAttackHit attack (GameState (BSS playerState attacks) bv))
+  where (PlayerState ships hits) = playerState
+
+-- given an attack from opponent, and player's current game state, does the attack sink a ship
+doesAttackSinkShip :: Attack -> GameState -> Bool
+doesAttackSinkShip attack (GameState (BSS playerState attacks) bv) = any (isShipHit attack) (filter (isShipAlmostSunk playerState) ships)
+  where (PlayerState ships hits) = playerState
+
+-- given an attack from opponent, and player's current game state, were any ships hit
+isAttackHit :: Attack -> GameState -> Bool
+isAttackHit attack (GameState (BSS playerState attacks) bv) = (length (filter (== True) (map (isShipHit attack) ships))) == 1
+  where (PlayerState ships hits) = playerState
+
+-- given an attack, is the ship hit
+isShipHit :: Attack -> Ship -> Bool
+isShipHit (Square x y) (Ship squares) = (length (filter (== (Square x y)) squares)) == 1
+
+-- returns true if the ship is 1 hit away from being sunk
+isShipAlmostSunk :: PlayerState -> Ship -> Bool
+isShipAlmostSunk playerState (Ship squares) = (numberOfHitsOnShip squares playerState) == ((length squares) -1)
+
+-- returns true if the ship has been sunk
+isShipSunk :: PlayerState -> Ship -> Bool
+isShipSunk playerState (Ship squares) = (numberOfHitsOnShip squares playerState) == (length squares)
+
+-- given a ship's gridsquares and a player state, how many hits are on the ship
+numberOfHitsOnShip :: [GridSquare] -> PlayerState -> Int
+numberOfHitsOnShip [] (PlayerState ships hits) = 0
+numberOfHitsOnShip (head:tail) (PlayerState ships hits)| elem head hits = 1 + (numberOfHitsOnShip tail (PlayerState ships hits))
+numberOfHitsOnShip (head:tail) (PlayerState ships hits) = numberOfHitsOnShip tail (PlayerState ships hits)
+
+lostGame :: GameState -> Bool
+lostGame (GameState (BSS playerState attacks) bv) = length hits == totalShipLength
   where (PlayerState ships hits) = playerState
 
 updateOnResponse :: Response -> GameState -> GameState
