@@ -246,21 +246,23 @@ combineLines y playerLines oppLines =
 
 parseAttack :: String -> Maybe Attack
 parseAttack str = maybeAttack maybeX maybeY
-  where [x, y] = words str
-        maybeX = getXCoord x
-        maybeY = getYCoord y
-        
+  where coords = words str
+        maybeX = getXCoord coords
+        maybeY = getYCoord coords
+
 maybeAttack :: Maybe XCoord -> Maybe YCoord -> Maybe Attack
 maybeAttack Nothing _ = Nothing
 maybeAttack _ Nothing = Nothing
 maybeAttack (Just xcoord) (Just ycoord) = Just (Square xcoord ycoord)
 
-getXCoord :: String -> Maybe XCoord
-getXCoord = readMaybe
+getXCoord :: [String] -> Maybe XCoord
+getXCoord [x, _]= readMaybe x
+getXCoord _ = Nothing
 
-getYCoord :: String -> Maybe YCoord
-getYCoord str = toYCoord num
-  where num = readMaybe str :: Maybe Int
+getYCoord :: [String] -> Maybe YCoord
+getYCoord [_, y] = toYCoord num
+  where num = readMaybe y :: Maybe Int
+getYCoord _ = Nothing
 
 toYCoord :: Maybe Int -> Maybe YCoord
 toYCoord Nothing = Nothing

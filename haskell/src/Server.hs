@@ -40,6 +40,7 @@ open addr =
 acceptConn :: Socket -> IO ()
 acceptConn sock = do
   putStrLn "Waiting for a player to connect..."
+  putStrLn ""
   E.bracketOnError
     (accept sock)
     (close . fst)

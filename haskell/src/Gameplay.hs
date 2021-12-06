@@ -61,7 +61,9 @@ sendAttack s gs = do
 
 sendAttackHelper :: Socket -> GameState -> Maybe Attack -> IO ()
 sendAttackHelper s gs Nothing = do
+  putStrLn ""
   putStrLn "We cannot attack there, Captain! Pick another target!"
+  putStrLn ""
   sendAttack s gs
 sendAttackHelper s gs (Just attack)
   | notPrevAttack attack gs = do
@@ -69,7 +71,9 @@ sendAttackHelper s gs (Just attack)
     sendAll s (C.pack (show attack))
     getResponse s gs
   | otherwise = do
+    putstrLn ""
     putStrLn "We already fired on that location, Captain! Pick another target!"
+    putStrLn ""
     sendAttack s gs
 
 -- Read the connection's response to the sent attack
