@@ -1,6 +1,6 @@
 -- {-# LANGUAGE OverloadedStrings #-}
 
-module Server (createServer) where
+module Client (createClient) where
 
 import qualified Control.Exception as E
 import qualified Data.ByteString.Char8 as C
@@ -8,10 +8,10 @@ import Network.Socket
 import Network.Socket.ByteString (recv, sendAll)
 import System.IO (getLine)
 
-{- server socket creation adapted from https://hackage.haskell.org/package/network-3.1.2.5/docs/Network-Socket.html -}
+{- client socket creation adapted from https://hackage.haskell.org/package/network-3.1.2.5/docs/Network-Socket.html -}
 
-runServer :: Socket -> IO ()
-runServer s = do
+runClient :: Socket -> IO ()
+runClient s = do
   C.putStrLn (C.pack "Welcome to Battleship!\n")
   --   TODO: Write any other game init stuff here
   runGame s
@@ -19,43 +19,44 @@ runServer s = do
 runGame :: Socket -> IO ()
 runGame s = do
   -- Assuming that the server goes first
-  sendServerAttack s
-  getClientResponse s
-  getClientAttack s
-  sendServerResponse s
+  getServerAttack s
+  sendClientResponse s
+  sendClientAttack s
+  getServerResponse s
   runGame s
 
 -- Read attack that user passes in and send it to the client
-sendServerAttack :: Socket -> IO ()
-sendServerAttack s = do
+sendClientAttack :: Socket -> IO ()
+sendClientAttack s = do
   msg <- getLine
-  --   TODO: Parse the msg into an coordinate forward it to the client
+  --   TODO: Parse the msg into an coordinate forward it to the server
   sendAll s (C.pack (msg ++ "\n"))
 
-sendServerResponse :: Socket -> IO ()
-sendServerResponse s = do
+sendClientResponse :: Socket -> IO ()
+sendClientResponse s = do
   msg <- getLine
-  --   TODO: Parse the message into a hit or miss and forward it to the client
+  --   TODO: Parse the message into a hit or miss and forward it to the server
   sendAll s (C.pack (msg ++ "\n"))
 
--- Read the attack that the client sends and update the game state accordingly
-getClientAttack :: Socket -> IO ()
-getClientAttack s = do
+-- Read the attack that the server sends and update the game state accordingly
+getServerAttack :: Socket -> IO ()
+getServerAttack s = do
   msg <- recv s 1024
   --   TODO: Parse the msg into an coordinate and update game state accordingly
   C.putStr msg
 
--- Read the client's response to the server attack
-getClientResponse :: Socket -> IO ()
-getClientResponse s = do
+-- Read the server's response to the client attack
+getServerResponse :: Socket -> IO ()
+getServerResponse s = do
   msg <- recv s 1024
   --   TODO: Parse the msg into a hit or miss and update game state accordingly
   C.putStr msg
 
 resolve :: IO AddrInfo
 resolve = do
-  let hints = Just $ defaultHints {addrFlags = [AI_PASSIVE, AI_NUMERICSERV], addrSocketType = Stream}
-  head <$> getAddrInfo hints Nothing (Just "3000")
+  let hints = defaultHints {addrSocketType = Stream}
+  --   TODO: Change 127.0.0.1 to a host
+  head <$> getAddrInfo (Just hints) (Just "127.0.0.1") (Just "3000")
 
 openSocket :: AddrInfo -> IO Socket
 openSocket addr = socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr)
@@ -66,23 +67,8 @@ open addr =
     (openSocket addr)
     close
     ( \sock -> do
-        setSocketOption sock ReuseAddr 1
-        withFdSocket sock setCloseOnExecIfNeeded
-        bind sock $ addrAddress addr
-        -- putStrLn "Bound to port"
-        listen sock 1024
-        -- putStrLn "Listening..."
+        connect sock $ addrAddress addr
         return sock
-    )
-
-acceptConn :: Socket -> IO ()
-acceptConn sock =
-  E.bracketOnError
-    (accept sock)
-    (close . fst)
-    ( \(connection, _peer) -> do
-        putStrLn "Connected to client!"
-        runServer connection
     )
 
 createSocket :: IO ()
@@ -93,7 +79,7 @@ createSocket = do
   -- putStrLn ""
   addr <- resolve
   -- putStrLn "Resolved AddrInfo struct"
-  E.bracket (open addr) close acceptConn
+  E.bracket (open addr) close runClient
 
-createServer :: IO ()
-createServer = createSocket
+createClient :: IO ()
+createClient = createSocket
