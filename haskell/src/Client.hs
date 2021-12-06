@@ -1,6 +1,6 @@
 -- {-# LANGUAGE OverloadedStrings #-}
 
-module Server (createServer) where
+module Client (createClient) where
 
 import qualified Control.Exception as E
 import qualified Data.ByteString.Char8 as C
@@ -8,10 +8,10 @@ import Network.Socket
 import Network.Socket.ByteString (recv, sendAll)
 import System.IO (getLine)
 
-{- server socket creation adapted from https://hackage.haskell.org/package/network-3.1.2.5/docs/Network-Socket.html -}
+{- client socket creation adapted from https://hackage.haskell.org/package/network-3.1.2.5/docs/Network-Socket.html -}
 
-runServer :: Socket -> IO ()
-runServer s = do
+runClient :: Socket -> IO ()
+runClient s = do
   C.putStrLn (C.pack "Welcome to Battleship!\n")
   --   Write any other game init stuff here
   runGame s
@@ -23,21 +23,22 @@ runGame s = do
   getClientInput s
   runGame s
 
-getServerInput :: Socket -> IO ()
-getServerInput s = do
+getClientInput :: Socket -> IO ()
+getClientInput s = do
   msg <- getLine
   sendAll s (C.pack (msg ++ "\n"))
 
-getClientInput :: Socket -> IO ()
-getClientInput s = do
+getServerInput :: Socket -> IO ()
+getServerInput s = do
   msg <- recv s 1024
   --   putStr "Received: "
   C.putStr msg
 
 resolve :: IO AddrInfo
 resolve = do
-  let hints = Just $ defaultHints {addrFlags = [AI_PASSIVE, AI_NUMERICSERV], addrSocketType = Stream}
-  head <$> getAddrInfo hints Nothing (Just "3000")
+  let hints = defaultHints {addrSocketType = Stream}
+  --   TODO: Change 127.0.0.1 to a host
+  head <$> getAddrInfo (Just hints) (Just "127.0.0.1") (Just "3000")
 
 openSocket :: AddrInfo -> IO Socket
 openSocket addr = socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr)
@@ -48,23 +49,8 @@ open addr =
     (openSocket addr)
     close
     ( \sock -> do
-        setSocketOption sock ReuseAddr 1
-        withFdSocket sock setCloseOnExecIfNeeded
-        bind sock $ addrAddress addr
-        -- putStrLn "Bound to port"
-        listen sock 1024
-        -- putStrLn "Listening..."
+        connect sock $ addrAddress addr
         return sock
-    )
-
-acceptConn :: Socket -> IO ()
-acceptConn sock =
-  E.bracketOnError
-    (accept sock)
-    (close . fst)
-    ( \(connection, _peer) -> do
-        putStrLn "Connected to client!"
-        runServer connection
     )
 
 createSocket :: IO ()
@@ -75,7 +61,7 @@ createSocket = do
   -- putStrLn ""
   addr <- resolve
   -- putStrLn "Resolved AddrInfo struct"
-  E.bracket (open addr) close acceptConn
+  E.bracket (open addr) close runClient
 
-createServer :: IO ()
-createServer = createSocket
+createClient :: IO ()
+createClient = createSocket
