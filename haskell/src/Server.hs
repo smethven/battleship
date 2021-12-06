@@ -19,19 +19,37 @@ runServer s = do
 runGame :: Socket -> IO ()
 runGame s = do
   -- Assuming that the server goes first
-  getServerInput s
-  getClientInput s
+  sendServerAttack s
+  getClientResponse s
+  getClientAttack s
+  sendServerResponse s
   runGame s
 
-getServerInput :: Socket -> IO ()
-getServerInput s = do
+-- Read attack that user passes in and send it to the client
+sendServerAttack :: Socket -> IO ()
+sendServerAttack s = do
   msg <- getLine
+  --   Parse the msg into an coordinate forward it to the client
   sendAll s (C.pack (msg ++ "\n"))
 
-getClientInput :: Socket -> IO ()
-getClientInput s = do
+sendServerResponse :: Socket -> IO ()
+sendServerResponse s = do
+  msg <- getLine
+  --   Parse the message into a hit or miss and forward it to the client
+  sendAll s (C.pack (msg ++ "\n"))
+
+-- Read the attack that the client sends and update the game state accordingly
+getClientAttack :: Socket -> IO ()
+getClientAttack s = do
   msg <- recv s 1024
-  --   putStr "Received: "
+  --   Parse the msg into an coordinate and update game state accordingly
+  C.putStr msg
+
+-- Read the client's response to the server attack
+getClientResponse :: Socket -> IO ()
+getClientResponse s = do
+  msg <- recv s 1024
+  --   Parse the msg into a hit or miss and update game state accordingly
   C.putStr msg
 
 resolve :: IO AddrInfo
