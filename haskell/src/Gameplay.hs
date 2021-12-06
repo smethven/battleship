@@ -19,12 +19,27 @@ import Gamestate
 gameStartPrintout :: IO ()
 gameStartPrintout = putStrLn "Captain! An enemy fleet has appeared within striking distance!"
 
+gameOver :: IO ()
+gameOver = putStrLn "GAME OVER"
+
+enemyRetreating :: IO ()
+enemyRetreating = do
+  putStrLn "The enemy is retreating!"
+  putStrLn "We're counting that as a victory."
+  gameOver
+
 -- Read the attack that the connection sends and update the game state accordingly
 getAttack :: Socket -> GameState -> IO ()
 getAttack s gs = do
   putStrLn "The enemy is attacking!" >> putStrLn "..."
   msg <- recv s 1024
-  let mAttack = readMaybe (C.unpack msg) :: Maybe Attack
+  let msg1 = C.unpack msg
+  checkAttackNotEmpty s gs msg1
+
+checkAttackNotEmpty :: Socket -> GameState -> String -> IO ()
+checkAttackNotEmpty _ _ "" = enemyRetreating
+checkAttackNotEmpty s gs msg = do
+  let mAttack = readMaybe msg :: Maybe Attack
   getAttackHelper s gs mAttack
 
 getAttackHelper :: Socket -> GameState -> Maybe Attack -> IO ()
@@ -40,8 +55,8 @@ getAttackHelper s gs (Just attack) = do
 handleAttack :: Socket -> GameState -> Response -> IO ()
 handleAttack _ _ (Response _ _ _ True) = do
   putStrLn "Hit! They sunk our last ship! We're going down!"
-  putStrLn "You lost...!"
-  putStrLn "GAME OVER"
+  putStrLn "You lost..."
+  gameOver
 handleAttack s gs response = do
   tellResponse response
   sendAll s (C.pack (show response))
@@ -80,7 +95,13 @@ sendAttackHelper s gs (Just attack)
 getResponse :: Socket -> GameState -> IO ()
 getResponse s gs = do
   msg <- recv s 1024
-  let mResponse = readMaybe (C.unpack msg) :: Maybe Response
+  let msg1 = C.unpack msg
+  checkAttackNotEmpty s gs msg1
+
+checkResponseNotEmpty :: Socket -> GameState -> String -> IO ()
+checkResponseNotEmpty _ _ "" = enemyRetreating
+checkResponseNotEmpty s gs msg = do
+  let mResponse = readMaybe msg :: Maybe Response
   getResponseHelper s gs mResponse
 
 getResponseHelper :: Socket -> GameState -> Maybe Response -> IO ()
@@ -96,7 +117,7 @@ handleResponse :: Socket -> GameState -> Response -> IO ()
 handleResponse _ _ (Response _ _ _ True) = do
   putStrLn "Hit! You sunk the last ship!"
   putStrLn "You won!"
-  putStrLn "GAME OVER"
+  gameOver
 handleResponse s gs response = do
   tellResponse response
   getAttack s gs
