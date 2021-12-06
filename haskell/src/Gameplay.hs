@@ -71,7 +71,7 @@ sendAttackHelper s gs (Just attack)
     sendAll s (C.pack (show attack))
     getResponse s gs
   | otherwise = do
-    putstrLn ""
+    putStrLn ""
     putStrLn "We already fired on that location, Captain! Pick another target!"
     putStrLn ""
     sendAttack s gs
