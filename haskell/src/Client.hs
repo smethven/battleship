@@ -13,7 +13,7 @@ import System.IO (getLine)
 runClient :: Socket -> IO ()
 runClient s = do
   C.putStrLn (C.pack "Welcome to Battleship!\n")
-  --   Write any other game init stuff here
+  --   TODO: Write any other game init stuff here
   runGame s
 
 runGame :: Socket -> IO ()
@@ -29,27 +29,27 @@ runGame s = do
 sendClientAttack :: Socket -> IO ()
 sendClientAttack s = do
   msg <- getLine
-  --   Parse the msg into an coordinate forward it to the server
+  --   TODO: Parse the msg into an coordinate forward it to the server
   sendAll s (C.pack (msg ++ "\n"))
 
 sendClientResponse :: Socket -> IO ()
 sendClientResponse s = do
   msg <- getLine
-  --   Parse the message into a hit or miss and forward it to the server
+  --   TODO: Parse the message into a hit or miss and forward it to the server
   sendAll s (C.pack (msg ++ "\n"))
 
 -- Read the attack that the server sends and update the game state accordingly
 getServerAttack :: Socket -> IO ()
 getServerAttack s = do
   msg <- recv s 1024
-  --   Parse the msg into an coordinate and update game state accordingly
+  --   TODO: Parse the msg into an coordinate and update game state accordingly
   C.putStr msg
 
 -- Read the server's response to the client attack
 getServerResponse :: Socket -> IO ()
 getServerResponse s = do
   msg <- recv s 1024
-  --   Parse the msg into a hit or miss and update game state accordingly
+  --   TODO: Parse the msg into a hit or miss and update game state accordingly
   C.putStr msg
 
 resolve :: IO AddrInfo
