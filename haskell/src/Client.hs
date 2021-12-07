@@ -16,14 +16,27 @@ runClient s = do
   gameStartPrintout
   getAttack s clientStartState
 
+checkHostAddr :: String -> String
+checkHostAddr "localhost" = "127.0.0.1"
+checkHostAddr string = string
+
 resolve :: IO AddrInfo
 resolve = do
   let hints = defaultHints {addrSocketType = Stream}
-  --   TODO: Change 127.0.0.1 to a host
-  head <$> getAddrInfo (Just hints) (Just "127.0.0.1") (Just "3000")
+  putStrLn "What host would you like to connect to?"
+  putStrLn "Please type 'localhost' or an IPv4 address in dot notation."
+  host <- getLine
+  let hostAddr = checkHostAddr host
+  head <$> getAddrInfo (Just hints) (Just hostAddr) (Just "3000")
 
 openSocket :: AddrInfo -> IO Socket
 openSocket addr = socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr)
+
+attemptConnection :: Socket -> IO Socket
+attemptConnection sock =
+  E.onException
+    (connect sock $ addrAddress addr >> return sock)
+    (putStrLn "Unable to connect to the given address." >> close sock)
 
 open :: AddrInfo -> IO Socket
 open addr =
