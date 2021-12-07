@@ -50,12 +50,12 @@ getAttackHelper _ _ Nothing =
 getAttackHelper s gs (Just attack) = do
   let gameResponse = makeResponseFromAttack attack gs
   let gs1 = updateOnAttack attack gs
-  displayBoards gs1
   handleAttack s gs1 gameResponse
 
 -- Print result of connection's attack and make decisions about game continuation
 handleAttack :: Socket -> GameState -> Response -> IO ()
-handleAttack _ _ (Response (Square x y) _ _ True) = do
+handleAttack _ gs (Response (Square x y) _ _ True) = do
+  displayBoards gs
   putStrLn ("Hit at " ++ (attackLocation x y) ++ "! They sunk our last ship! We're going down!")
   putStrLn "You lost..."
   gameOver
@@ -68,7 +68,7 @@ handleAttack s gs response = do
         tellResponse (Response (Square x y) True _ _) =
           putStrLn ("They hit our ship at " ++ (attackLocation x y ++) "!")
         tellResponse (Response (Square x y) False _ _) =
-          putStrLn ("They missed! They only hit " ++ (attackLocation x y) ++ " Phew!")
+          putStrLn ("They missed! They only hit " ++ (attackLocation x y) ++ "! Phew!")
 
 -- Read attack that user supplies and send it to the other connection
 sendAttack :: Socket -> GameState -> IO ()
@@ -101,7 +101,7 @@ getResponse :: Socket -> GameState -> IO ()
 getResponse s gs = do
   msg <- recv s 1024
   let msg1 = C.unpack msg
-  checkAttackNotEmpty s gs msg1
+  checkResponseNotEmpty s gs msg1
 
 checkResponseNotEmpty :: Socket -> GameState -> String -> IO ()
 checkResponseNotEmpty _ _ "" = enemyRetreating
