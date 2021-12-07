@@ -54,11 +54,12 @@ getAttackHelper s gs (Just attack) = do
 
 -- Print result of connection's attack and make decisions about game continuation
 handleAttack :: Socket -> GameState -> Response -> IO ()
-handleAttack _ gs (Response (Square x y) _ _ True) = do
+handleAttack s gs (Response (Square x y) hit sunk True) = do
   displayBoards gs
   putStrLn ("Hit at " ++ (attackLocation x y) ++ "! They sunk our last ship! We're going down!")
   putStrLn "You lost..."
   gameOver
+  sendAll s (C.pack (show (Response (Square x y) hit sunk True)))
 handleAttack s gs response = do
   tellResponse response
   sendAll s (C.pack (show response))
