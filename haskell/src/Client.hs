@@ -35,8 +35,8 @@ openSocket addr = socket (addrFamily addr) (addrSocketType addr) (addrProtocol a
 attemptConnection :: AddrInfo -> Socket -> IO Socket
 attemptConnection addr sock =
   E.onException
-    (connect sock $ addrAddress addr >> return sock)
-    (putStrLn "Unable to connect to the given address." >> close sock)
+  ((connect sock $ addrAddress addr) >> return sock)
+  (putStrLn "Unable to connect to the given address.")
 
 open :: AddrInfo -> IO Socket
 open addr =
