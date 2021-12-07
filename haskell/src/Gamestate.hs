@@ -173,7 +173,7 @@ updateOnAttack attack gs =
   where (GameState bss bv) = gs
         (BSS ps pa) = bss
         (PlayerState ships hits) = ps
-        player = True
+        player = False
         hit = isAttackHit attack gs
         strike = if hit then [attack] else []
 
