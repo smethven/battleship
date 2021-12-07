@@ -4,38 +4,12 @@ import Text.Read (readMaybe)
 
 -- Battleship are two 10*10 grids, x-axis: A-J, y-axis: 0-9
 
--- One grid is your own battleships described by:
--- location of ships
--- location of hits on your ships
-
 -- ships cover squares on the grid
--- how many ships and of what size?
 -- 1 carrier: 5 squares long
 -- 1 battleship: 4 squares long
 -- 1 cruiser: 3 squares long
 -- 1 submarine: 3 squares long
 -- 1 destroyer: 2 squares long
-
--- your move involves making a guess which would add to either hits or misses list of OpponentGrid, and if it hits then possibly adds to SunkShips list
--- if you hit then it also affects opponents own grid - adds to opponent's YourGrid misses
-
--- 1 init server game state and 1 init client game state
-
--- Well formed ship is straight and connected
--- straight
-    -- Either XCoord or YCoord is all the same
--- connected
-    -- Whichever is not the same must be able to be sorted
-    -- and then ascending or descending without break
-    -- e.g. C D E
-    -- 5 6 7
--- E.g. Ship [Coord A 3, Coord A 5, Coord A 4]
--- Sorted by the changing type of YCoord
--- Ship [Coord A 3, Coord A 4, Coord A 5]
--- X Cord is repeating and YCord is contiguous (no repeats)
-
--- no repeats maybe a set would be better
-
 
 -- GameState BattleshipState BoardView
 data GameState = GameState BattleshipState BoardView
@@ -265,39 +239,3 @@ toYCoord (Just y) | y >= 0 && y < 10 = Just (toEnum y)
 
 attackLocation :: XCoord -> YCoord -> String
 attackLocation x y = (show x) ++ " " ++ (show (fromEnum y))
-
-
-testBoardView :: BoardView
-testBoardView = BV testBoard testBoard
-
-testBoard :: [[String]]
-testBoard = [["S", "~", "S", "S", "S", "~", "~", "~", "~", "~"],
-             ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
-             ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
-             ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
-             ["~", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
-             ["~", "~", "~", "~", "X", "X", "X", "~", "~", "~"],
-             ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"],
-             ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"],
-             ["~", "~", "~", "~", "~", "~", "~", "S", "S", "~"],
-             ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"]]
-
--- note board view is a stub and is not accurate of current state
--- this state has hits on all the first ship's squares except Square B One
-testAlmostSunkState :: GameState
-testAlmostSunkState = GameState (BSS (PlayerState [Ship [Square B One, Square C One, Square D One, Square E One, Square F One],
-                                 Ship [Square I One, Square I Two, Square I Three, Square I Four],
-                                 Ship [Square C Three, Square D Three, Square E Three],
-                                 Ship [Square A Six, Square A Seven, Square A Eight],
-                                 Ship [Square H Nine, Square I Nine]] [Square C One, Square D One, Square E One, Square F One] ) []) (serverBoardView)
-
--- note board view is a stub and is not accurate of current state
--- this state has hits on all ship squares except Square H Nine
-testAlmostLostState :: GameState
-testAlmostLostState = GameState (BSS (PlayerState [Ship [Square B One, Square C One, Square D One, Square E One, Square F One],
-                                 Ship [Square I One, Square I Two, Square I Three, Square I Four],
-                                 Ship [Square C Three, Square D Three, Square E Three],
-                                 Ship [Square A Six, Square A Seven, Square A Eight],
-                                 Ship [Square H Nine, Square I Nine]] 
-                                 [Square B One, Square C One, Square D One, Square E One, Square F One, Square I One, Square I Two, Square I Three, Square I Four,
-                                 Square C Three, Square D Three, Square E Three, Square A Six, Square A Seven, Square A Eight, Square I Nine] ) []) (serverBoardView)

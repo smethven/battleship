@@ -3,3 +3,15 @@ TODO:
 Game state and updates to it
 Let the user select which host to connect to
 Testing all parts
+
+
+Learned about:
+- Creating and using sockets and network connections, and sending data back and forth in a pure, lazy, functional language, using monads and monadic operations
+- Connecting non-monadic data types and monadic networking/user interactions to each other to create the gameplay.
+- Error handling and the different constructs for doing (bracketOnError, bracket, onException) (See Client.hs and Server.hs)
+- This (the above error handling) as opposed to handling unwanted inputs, using Maybe types (See Gamestate.hs)
+- Using do syntax to easily and susinctly link together monadic operations, many with multiple different arguments (which less elegant to do with just >> and >>=), as well as non-monadic operations in between with 'let' bindings to create temporary data transformations. (See Gameplay.hs and all the 'do's and 'let's)
+- packing data into ByteStrings for sending into and reading from the socket (using 'pack' and 'unpack' in Gameplay.hs)
+- Using 'deriving (Show, Read)' with defined types to convert data to and from strings for sending over the network connection (See Gamestate.hs)
+- Using the module import system to separate data into different files for different concerns/domains.
+- Passing the socket and gamestate data as threaded accumulators (through the functions in Gameplay.hs as well as other places, like Server and Client) to maintain access (as opposed to maintaining "state" like in OOP).

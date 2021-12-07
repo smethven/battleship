@@ -18,3 +18,40 @@ defaultMain $ testGroup "Tests" $
   --     assertFailure "BOOM!"
   ]
 -}
+
+
+
+-- testBoardView :: BoardView
+-- testBoardView = BV testBoard testBoard
+
+-- testBoard :: [[String]]
+-- testBoard = [["S", "~", "S", "S", "S", "~", "~", "~", "~", "~"],
+--              ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
+--              ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
+--              ["S", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
+--              ["~", "~", "~", "~", "~", "~", "X", "~", "~", "~"],
+--              ["~", "~", "~", "~", "X", "X", "X", "~", "~", "~"],
+--              ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"],
+--              ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"],
+--              ["~", "~", "~", "~", "~", "~", "~", "S", "S", "~"],
+--              ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"]]
+
+-- -- note board view is a stub and is not accurate of current state
+-- -- this state has hits on all the first ship's squares except Square B One
+-- testAlmostSunkState :: GameState
+-- testAlmostSunkState = GameState (BSS (PlayerState [Ship [Square B One, Square C One, Square D One, Square E One, Square F One],
+--                                  Ship [Square I One, Square I Two, Square I Three, Square I Four],
+--                                  Ship [Square C Three, Square D Three, Square E Three],
+--                                  Ship [Square A Six, Square A Seven, Square A Eight],
+--                                  Ship [Square H Nine, Square I Nine]] [Square C One, Square D One, Square E One, Square F One] ) []) (serverBoardView)
+
+-- -- note board view is a stub and is not accurate of current state
+-- -- this state has hits on all ship squares except Square H Nine
+-- testAlmostLostState :: GameState
+-- testAlmostLostState = GameState (BSS (PlayerState [Ship [Square B One, Square C One, Square D One, Square E One, Square F One],
+--                                  Ship [Square I One, Square I Two, Square I Three, Square I Four],
+--                                  Ship [Square C Three, Square D Three, Square E Three],
+--                                  Ship [Square A Six, Square A Seven, Square A Eight],
+--                                  Ship [Square H Nine, Square I Nine]] 
+--                                  [Square B One, Square C One, Square D One, Square E One, Square F One, Square I One, Square I Two, Square I Three, Square I Four,
+--                                  Square C Three, Square D Three, Square E Three, Square A Six, Square A Seven, Square A Eight, Square I Nine] ) []) (serverBoardView)

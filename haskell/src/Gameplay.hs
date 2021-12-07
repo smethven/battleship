@@ -33,7 +33,8 @@ enemyRetreating = do
 -- Read the attack that the connection sends and update the game state accordingly
 getAttack :: Socket -> GameState -> IO ()
 getAttack s gs = do
-  putStrLn "The enemy is attacking!" >> putStrLn "..."
+  putStrLn "The enemy is attacking!"
+  putStrLn "..."
   msg <- recv s 1024
   let msg1 = C.unpack msg
   checkAttackNotEmpty s gs msg1
