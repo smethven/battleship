@@ -8,6 +8,7 @@ import Gamestate
     ( Attack,
       Response(..),
       GameState(..),
+      Square(..),
       notPrevAttack,
       makeResponseFromAttack,
       updateOnAttack,
