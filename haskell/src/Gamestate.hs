@@ -8,11 +8,6 @@ import Text.Read (readMaybe)
 -- location of ships
 -- location of hits on your ships
 
--- Other grid is opponent battleships:
--- location of sunk ships
--- location of hits of your guesses
--- location of misses of your guesses
-
 -- ships cover squares on the grid
 -- how many ships and of what size?
 -- 1 carrier: 5 squares long
@@ -132,10 +127,6 @@ totalShipLength = 17
 
 -- Functions
 
--- given coords from player, make an attack
-makeAttackFromCoords :: XCoord -> YCoord -> Attack
-makeAttackFromCoords x y = Square x y
-
 notPrevAttack :: Attack -> GameState -> Bool
 notPrevAttack attack (GameState (BSS _ pvAttacks) _) = notElem attack pvAttacks
 
@@ -169,10 +160,6 @@ isShipHit (Square x y) (Ship squares) = (length (filter (== (Square x y)) square
 isShipAlmostSunk :: PlayerState -> Ship -> Bool
 isShipAlmostSunk playerState (Ship squares) = (numberOfHitsOnShip squares playerState) == ((length squares) -1)
 
--- returns true if the ship has been sunk
-isShipSunk :: PlayerState -> Ship -> Bool
-isShipSunk playerState (Ship squares) = (numberOfHitsOnShip squares playerState) == (length squares)
-
 -- given a ship's gridsquares and a player state, how many hits are on the ship
 numberOfHitsOnShip :: [GridSquare] -> PlayerState -> Int
 numberOfHitsOnShip [] (PlayerState ships hits) = 0
@@ -180,24 +167,31 @@ numberOfHitsOnShip (head:tail) (PlayerState ships hits)
   | elem head hits = 1 + numberOfHitsOnShip tail (PlayerState ships hits)
   | otherwise = numberOfHitsOnShip tail (PlayerState ships hits)
 
-lostGame :: GameState -> Bool
-lostGame (GameState (BSS playerState attacks) bv) = length hits == totalShipLength
-  where (PlayerState ships hits) = playerState
-
 updateOnAttack :: Attack -> GameState -> GameState
-updateOnAttack _ _ = undefined -- TODO
+updateOnAttack attack gs =
+  GameState (BSS (PlayerState ships (strike ++ hits)) pa) (updateBV player attack hit bv)
+  where (GameState bss bv) = gs
+        (BSS ps pa) = bss
+        (PlayerState ships hits) = ps
+        player = True
+        hit = isAttackHit attack gs
+        strike = if hit then [attack] else []
 
 updateOnResponse :: Response -> GameState -> GameState
 updateOnResponse (Response square hit sunk won) (GameState bss bv) =
-  GameState (updateBSSOnResponse square bss) (updateBVOnRepsonse square hit bv)
+  GameState (updateBSSOnResponse square bss) (updateBV opponent square hit bv)
+  where opponent = True
 
 updateBSSOnResponse :: GridSquare -> BattleshipState -> BattleshipState
 updateBSSOnResponse attack (BSS state attacks) = BSS state (attack:attacks)
 
-updateBVOnRepsonse :: GridSquare -> Bool -> BoardView -> BoardView
-updateBVOnRepsonse square hit (BV playerBoard oppBoard) =
+updateBV :: Bool -> GridSquare -> Bool -> BoardView -> BoardView
+updateBV True square hit (BV playerBoard oppBoard) =
   BV playerBoard (updateBoard square update oppBoard)
-    where  update = if hit then Hit else Miss
+    where update = if hit then Hit else Miss
+updateBV False square hit (BV playerBoard oppBoard) =
+  BV (updateBoard square update playerBoard) oppBoard
+    where update = if hit then Hit else Miss
 
 updateBoard :: GridSquare -> UpdateType -> [[String]] -> [[String]]
 updateBoard _ _ [] = []
@@ -284,3 +278,23 @@ testBoard = [["S", "~", "S", "S", "S", "~", "~", "~", "~", "~"],
              ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"],
              ["~", "~", "~", "~", "~", "~", "~", "S", "S", "~"],
              ["~", "~", "~", "~", "~", "~", "~", "~", "~", "~"]]
+
+-- note board view is a stub and is not accurate of current state
+-- this state has hits on all the first ship's squares except Square B One
+testAlmostSunkState :: GameState
+testAlmostSunkState = GameState (BSS (PlayerState [Ship [Square B One, Square C One, Square D One, Square E One, Square F One],
+                                 Ship [Square I One, Square I Two, Square I Three, Square I Four],
+                                 Ship [Square C Three, Square D Three, Square E Three],
+                                 Ship [Square A Six, Square A Seven, Square A Eight],
+                                 Ship [Square H Nine, Square I Nine]] [Square C One, Square D One, Square E One, Square F One] ) []) (serverBoardView)
+
+-- note board view is a stub and is not accurate of current state
+-- this state has hits on all ship squares except Square H Nine
+testAlmostLostState :: GameState
+testAlmostLostState = GameState (BSS (PlayerState [Ship [Square B One, Square C One, Square D One, Square E One, Square F One],
+                                 Ship [Square I One, Square I Two, Square I Three, Square I Four],
+                                 Ship [Square C Three, Square D Three, Square E Three],
+                                 Ship [Square A Six, Square A Seven, Square A Eight],
+                                 Ship [Square H Nine, Square I Nine]] 
+                                 [Square B One, Square C One, Square D One, Square E One, Square F One, Square I One, Square I Two, Square I Three, Square I Four,
+                                 Square C Three, Square D Three, Square E Three, Square A Six, Square A Seven, Square A Eight, Square I Nine] ) []) (serverBoardView)
