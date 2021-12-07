@@ -8,7 +8,7 @@ import Gamestate
     ( Attack,
       Response(..),
       GameState(..),
-      Square(..),
+      GridSquare(..),
       notPrevAttack,
       makeResponseFromAttack,
       updateOnAttack,
