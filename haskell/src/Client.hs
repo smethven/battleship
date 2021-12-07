@@ -32,7 +32,7 @@ resolve = do
 openSocket :: AddrInfo -> IO Socket
 openSocket addr = socket (addrFamily addr) (addrSocketType addr) (addrProtocol addr)
 
-attemptConnection :: Socket -> IO Socket
+attemptConnection :: AddrInfo -> Socket -> IO Socket
 attemptConnection sock =
   E.onException
     (connect sock $ addrAddress addr >> return sock)
@@ -43,10 +43,7 @@ open addr =
   E.bracketOnError
     (openSocket addr)
     close
-    ( \sock -> do
-        connect sock $ addrAddress addr
-        return sock
-    )
+    (attemptConnection addr)
 
 createSocket :: IO ()
 createSocket = do
