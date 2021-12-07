@@ -263,6 +263,9 @@ toYCoord Nothing = Nothing
 toYCoord (Just y) | y >= 0 && y < 10 = Just (toEnum y)
                   | otherwise = Nothing
 
+attackLocation :: XCoord -> YCoord -> String
+attackLocation x y = (show x) ++ (show (fromEnum y))
+
 
 testBoardView :: BoardView
 testBoardView = BV testBoard testBoard

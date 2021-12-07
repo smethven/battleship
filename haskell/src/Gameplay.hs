@@ -13,7 +13,8 @@ import Gamestate
       updateOnAttack,
       updateOnResponse,
       showBoards,
-      parseAttack )
+      parseAttack,
+      attackLocation )
 
 -- The printout at the start of the game
 gameStartPrintout :: IO ()
@@ -54,20 +55,19 @@ getAttackHelper s gs (Just attack) = do
 -- Print result of connection's attack and make decisions about game continuation
 handleAttack :: Socket -> GameState -> Response -> IO ()
 handleAttack _ _ (Response (Square x y) _ _ True) = do
-  putStrLn "Hit at " ++ (attackLocation x y) ++ "! They sunk our last ship! We're going down!"
+  putStrLn ("Hit at " ++ (attackLocation x y) ++ "! They sunk our last ship! We're going down!")
   putStrLn "You lost..."
   gameOver
 handleAttack s gs response = do
   tellResponse response
   sendAll s (C.pack (show response))
   sendAttack s gs
-  where attackLocation x y = (show x) ++ (show (fromEnum y))
-        tellResponse (Response (Square x y) _ True _) =
-          putStrLn "Hit at " ++ (attackLocation x y) ++ "! They sunk our ship!"
-        tellResponse (Response (Square x y) _ True _ _) =
-          putStrLn "They hit our ship at " ++ (attackLocation x y ++) "!"
+  where tellResponse (Response (Square x y) _ True _) =
+          putStrLn ("Hit at " ++ (attackLocation x y) ++ "! They sunk our ship!")
+        tellResponse (Response (Square x y) True _ _) =
+          putStrLn ("They hit our ship at " ++ (attackLocation x y ++) "!")
         tellResponse (Response (Square x y) False _ _) =
-          putStrLn "They missed! They only hit " ++ (attackLocation x y) ++ " Phew!"
+          putStrLn ("They missed! They only hit " ++ (attackLocation x y) ++ " Phew!")
 
 -- Read attack that user supplies and send it to the other connection
 sendAttack :: Socket -> GameState -> IO ()
