@@ -3,6 +3,9 @@ module Main where
 import Client
 import Server
 
+-- Upon start of the program, we prompt the user whether they want to start a game or join one.
+-- If they choose to start one they fulfill the role of a server otherwise they are trying to join
+-- one and fulfill the role of a client.
 main :: IO ()
 main = do
   putStrLn "Welcome to Battleship! Would you like to start a game or join one? [S/J]"
